@@ -12,8 +12,6 @@ CC = g++
 
 INCLUDE =-Isrc/
 
-# FORCE_INCLUDE=-include rtstd.h
-
 .SUFFIXES: .o .cpp .cxx
 
 .cpp.o: 
@@ -22,14 +20,17 @@ INCLUDE =-Isrc/
 .cxx.o: 
 		$(CC) $(CFLAGS) $(INCLUDE) -c -o $*.o $<
 
-# this is necessary! Because it allows Make to understand which files need to be rebuilt
-# for ray...
-ALL.O = src/server.o
+all: server client
+
+client: src/client.o
+		$(CC) $(CFLAGS) -o $@ src/client.o $(INCLUDE) $(LIBDIR) $(LIBS)
+
+server: src/server.o
+		$(CC) $(CFLAGS) -o $@ src/server.o $(INCLUDE) $(LIBDIR) $(LIBS)
+
+ALL.O = src/server.o src/client.o
 
 ALL.H = $(wildcard src/*.h)
-
-server: $(ALL.O) $(ALL.H)
-		$(CC) $(CFLAGS) -o $@ $(ALL.O) $(INCLUDE) $(LIBDIR) $(LIBS)
 
 clean:
 		rm -f $(ALL.O)
