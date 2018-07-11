@@ -46,17 +46,16 @@ int main(int argc , char *argv[]) {
     while ( ( client_sock = accept( socket_desc, (struct sockaddr *)&client, &c ) ) ) {
         puts("Connection accepted");
          
-        pthread_t sniffer_thread;
+        pthread_t echo_thread;
         int * new_sock = (int*) malloc( 1 );
         *new_sock = client_sock;
          
-        if( pthread_create( &sniffer_thread, NULL, handle_connection, (void*) new_sock ) < 0 )
+        if( pthread_create( &echo_thread, NULL, handle_connection, (void*) new_sock ) < 0 )
         {
             perror("could not create thread");
             return 1;
         }
 
-        // pthread_join( sniffer_thread , NULL);
         puts("Handler assigned");
     }
      

@@ -29,14 +29,14 @@ int main(int argc , char *argv[]) {
         return 1;
     }
      
-    puts( "Connected\n" );
+    puts( "Connected" );
      
     //keep communicating with server
     while ( true ) {
         printf( "Enter message : " );
-        scanf( "%s" , message );
-         
-        //Send some data
+        if ( scanf( "%s" , message ) == EOF ) break;
+
+        // Send data
         if ( send( sock, message, strlen( message ), 0 ) < 0 ) {
             puts("Send failed");
             return 1;
