@@ -6,16 +6,14 @@
 
 #include "app_constants.h"
  
-int main(int argc , char *argv[])
-{
+int main(int argc , char *argv[]) {
     int sock;
     struct sockaddr_in server;
     char message[1000] , server_reply[2000];
      
-    //Create socket
-    sock = socket( AF_INET , SOCK_STREAM , 0 );
-    if ( sock == -1 )
-    {
+    // Create TCP socket (SOCK_STREAM)
+    sock = socket( AF_INET, SOCK_STREAM, 0 );
+    if ( sock == -1 ) {
         puts( "Could not create socket" );
         return 1;
     }
@@ -26,8 +24,7 @@ int main(int argc , char *argv[])
     server.sin_port = htons( SERVER_PORT );
  
     //Connect to remote server
-    if ( connect( sock, (struct sockaddr *)&server, sizeof( server ) ) < 0 )
-    {
+    if ( connect( sock, (struct sockaddr *)&server, sizeof( server ) ) < 0 ) {
         perror( "connect failed. Error" );
         return 1;
     }
@@ -35,21 +32,18 @@ int main(int argc , char *argv[])
     puts( "Connected\n" );
      
     //keep communicating with server
-    while ( true )
-    {
+    while ( true ) {
         printf( "Enter message : " );
         scanf( "%s" , message );
          
         //Send some data
-        if ( send( sock, message, strlen( message ), 0 ) < 0 )
-        {
+        if ( send( sock, message, strlen( message ), 0 ) < 0 ) {
             puts("Send failed");
             return 1;
         }
          
         // Receive a reply from the server
-        if( recv( sock, server_reply, 2000, 0 ) < 0)
-        {
+        if( recv( sock, server_reply, 2000, 0 ) < 0 ) {
             puts( "recv failed" );
             break;
         }

@@ -1,14 +1,17 @@
 #include "app_constants.h"
 
-#include<stdio.h>
-#include<string.h>    //strlen
-#include<sys/socket.h>
-#include<arpa/inet.h> //inet_addr
-#include<unistd.h>    //write
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+#include <sys/socket.h>
+#include <arpa/inet.h>
+#include <unistd.h>
+#include <pthread.h>
 
-int main(int argc , char *argv[])
-{
-    char client_message[2000];
+void * handle_connection( void *socket_desc );
+
+int main(int argc , char *argv[]) {
+    char client_message[2000]; // 2000 character limit on client message
      
     //Create socket
     int socket_desc = socket( AF_INET, SOCK_STREAM, 0 );
@@ -25,8 +28,7 @@ int main(int argc , char *argv[])
     server.sin_port = htons( SERVER_PORT );
      
     //Bind
-    if( bind( socket_desc, (struct sockaddr *)&server , sizeof(server) ) < 0 )
-    {
+    if( bind( socket_desc, (struct sockaddr *)&server , sizeof(server) ) < 0 ) {
         perror( "bind failed. Error" );
         return 1;
     }
@@ -39,14 +41,24 @@ int main(int argc , char *argv[])
     //Accept and incoming connection
     puts( "Waiting for incoming connections..." );
     socklen_t c = sizeof( struct sockaddr_in );
-     
-    //accept connection from an incoming client
-    int client_sock = accept( socket_desc, (struct sockaddr *)&client, &c );
-    if ( client_sock < 0 ) {
-        perror( "accept failed; could not accept connection from client" );
-        return 1;
+    int client_sock;
+
+    while ( ( client_sock = accept( socket_desc, (struct sockaddr *)&client, &c ) ) ) {
+        puts("Connection accepted");
+         
+        pthread_t sniffer_thread;
+        int * new_sock = (int*) malloc( 1 );
+        *new_sock = client_sock;
+         
+        if( pthread_create( &sniffer_thread, NULL, handle_connection, (void*) new_sock ) < 0 )
+        {
+            perror("could not create thread");
+            return 1;
+        }
+
+        // pthread_join( sniffer_thread , NULL);
+        puts("Handler assigned");
     }
-    puts( "Connection accepted" );
      
     int read_size;
     // Receive a message from client
@@ -63,4 +75,30 @@ int main(int argc , char *argv[])
     }
      
     return 0;
+}
+
+void * handle_connection( void *socket_desc )
+{
+    //Get the socket descriptor
+    int sock = *(int*)socket_desc;
+    int read_size;
+    char *message, client_message[2000];
+     
+    //Receive a message from client
+    while ( ( read_size = recv( sock, client_message, 2000, 0 ) ) > 0 )
+    {
+        //Send the message back to client
+        write( sock, client_message, strlen( client_message ) );
+    }
+     
+    if ( read_size == 0 ) {
+        puts( "Client disconnected" );
+    } else if ( read_size == -1 ) {
+        perror( "recv failed" );
+    }
+         
+    //Free the socket pointer
+    free( socket_desc );
+
+    pthread_exit( socket_desc );
 }
