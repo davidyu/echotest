@@ -2,12 +2,27 @@
 
 #include "SocketAddress.h"
 
-class TCPSocket {
+class UDPSocket {
 public:
-    static TCPSocket* Create();
-    virtual          ~TCPSocket() {}
+    static UDPSocket* Create();
+    virtual          ~UDPSocket() {} // TODO free and close me
+
+    int               Bind     ( const SocketAddress& local_addr );
+    int               SendTo   ( const void* data, int len, const SocketAddress& to_addr );
+    int               RecvFrom ( void* buf, int len, SocketAddress& from_addr );
 
 private:
-    // do not initialize me; use TCPSocket::Create()!
-    TCPSocket();
+    #if defined( _WIN64 ) || defined( _WIN32 )
+    UDPSocket( SOCKET sock )
+        : sock_( sock )
+    {}
+
+    SOCKET sock_;
+    #else
+    UDPSocket( int sock )
+        : sock_( sock )
+    {}
+
+    int sock_;
+    #endif
 };

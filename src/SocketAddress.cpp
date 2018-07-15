@@ -7,7 +7,7 @@ SocketAddress::SocketAddress( uint16_t port ) {
     addr->sin_family = AF_INET;
     addr->sin_port = htons( port );
     addr->sin_addr.s_addr = INADDR_ANY;
-    // memset( &addr->sin_zero, 0, sizeof( addr->sin_zero ) );
+    memset( &addr->sin_zero, 0, sizeof( addr->sin_zero ) );
 }
 
 SocketAddress::SocketAddress( char const* ip_str, uint16_t port ) {
