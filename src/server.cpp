@@ -1,5 +1,6 @@
 #include "app_constants.h"
 
+#include <ctype.h> // isdigit
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -8,49 +9,47 @@
 #include <unistd.h>
 #include <pthread.h>
 
-void * handle_connection( void *socket_desc );
+#include "SocketAddress.h"
+#include "TCPSocket.h"
 
-int main(int argc , char *argv[]) {
+void * handle_connection( void * client_socket );
+
+int main( int argc , char *argv[] ) {
+    // extract server IP address string (argv[1]) into 4 bytes
     char client_message[2000]; // 2000 character limit on client message
-     
-    //Create socket
-    int socket_desc = socket( AF_INET, SOCK_STREAM, 0 );
-    if ( socket_desc == -1 ) {
-        perror("Could not create socket");
+
+    // create socket
+    TCPSocket* server_socket = TCPSocket::Create();
+    if ( server_socket == nullptr ) {
+        perror( "Could not create server socket" );
         return 1;
     }
-    puts("Socket created");
+    puts( "Socket created" );
 
-    struct sockaddr_in server, client;
-    //Prepare the sockaddr_in structure
-    server.sin_family = AF_INET;
-    server.sin_addr.s_addr = INADDR_ANY;
-    server.sin_port = htons( SERVER_PORT );
+    SocketAddress server_addr( SERVER_PORT );
      
-    //Bind
-    if( bind( socket_desc, (struct sockaddr *)&server , sizeof(server) ) < 0 ) {
-        perror( "bind failed. Error" );
+    // bind
+    if ( server_socket->Bind( server_addr ) < 0 ) {
+        perror( "bind failed." );
         return 1;
     }
 
     puts( "bind done" );
      
     //Listen
-    listen( socket_desc, 3 );
+    server_socket->Listen( 10 ); // maximum of 10 buffered connections
      
     //Accept and incoming connection
     puts( "Waiting for incoming connections..." );
-    socklen_t c = sizeof( struct sockaddr_in );
-    int client_sock;
+    SocketAddress client_addr( SERVER_PORT );
+    TCPSocket* client_sock;
 
-    while ( ( client_sock = accept( socket_desc, (struct sockaddr *)&client, &c ) ) ) {
+    while ( ( client_sock = server_socket->Accept( client_addr ) ) ) {
         puts("Connection accepted");
          
         pthread_t echo_thread;
-        int * new_sock = (int*) malloc( 1 );
-        *new_sock = client_sock;
          
-        if( pthread_create( &echo_thread, NULL, handle_connection, (void*) new_sock ) < 0 )
+        if( pthread_create( &echo_thread, NULL, handle_connection, (void*) client_sock ) < 0 )
         {
             perror("could not create thread");
             return 1;
@@ -59,35 +58,26 @@ int main(int argc , char *argv[]) {
         puts("Handler assigned");
     }
      
-    int read_size;
-    // Receive a message from client
-    while ( ( read_size = recv( client_sock, client_message, 2000, 0 ) ) > 0 ) {
-        // Echo message back to client
-        write( client_sock, client_message , strlen( client_message ) );
-    }
-     
-    if ( read_size == 0 ) {
-        puts( "Client disconnected" );
-        fflush(stdout);
-    } else if ( read_size == -1 ) {
-        perror( "recv failed" );
-    }
-     
     return 0;
 }
 
-void * handle_connection( void *socket_desc )
+void * handle_connection( void *client_sock )
 {
     //Get the socket descriptor
-    int sock = *(int*)socket_desc;
+    TCPSocket* sock = (TCPSocket*) client_sock;
+
+    if ( client_sock == nullptr ) {
+        pthread_exit( client_sock );
+    }
+
     int read_size;
     char *message, client_message[2000];
      
     //Receive a message from client
-    while ( ( read_size = recv( sock, client_message, 2000, 0 ) ) > 0 )
+    while ( ( read_size = sock->Recv( client_message, 2000 ) ) > 0 )
     {
         //Send the message back to client
-        write( sock, client_message, strlen( client_message ) );
+        sock->Send( client_message, strlen( client_message ) );
     }
      
     if ( read_size == 0 ) {
@@ -96,8 +86,8 @@ void * handle_connection( void *socket_desc )
         perror( "recv failed" );
     }
          
-    //Free the socket pointer
-    free( socket_desc );
+    // Free the socket pointer
+    // free( socket_desc );
 
-    pthread_exit( socket_desc );
+    pthread_exit( client_sock );
 }

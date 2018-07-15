@@ -1,30 +1,29 @@
+#include "app_constants.h"
+
 #include <stdio.h> //printf
 #include <string.h>    //strlen
 #include <sys/socket.h>    //socket
 #include <arpa/inet.h> //inet_addr
 #include <unistd.h>
 
-#include "app_constants.h"
+#include "SocketAddress.h"
+#include "TCPSocket.h"
  
 int main(int argc , char *argv[]) {
-    int sock;
-    struct sockaddr_in server;
     char message[1000] , server_reply[2000];
      
-    // Create TCP socket (SOCK_STREAM)
-    sock = socket( AF_INET, SOCK_STREAM, 0 );
-    if ( sock == -1 ) {
-        puts( "Could not create socket" );
+    TCPSocket* socket = TCPSocket::Create();
+    if ( socket == nullptr ) {
+        perror( "Could not create socket" );
         return 1;
     }
     puts( "Socket created" );
-     
-    server.sin_addr.s_addr = inet_addr( "127.0.0.1" );
-    server.sin_family = AF_INET;
-    server.sin_port = htons( SERVER_PORT );
+    
+    char const * localhost = "127.0.0.1";
+    SocketAddress server_addr( localhost, SERVER_PORT );
  
     //Connect to remote server
-    if ( connect( sock, (struct sockaddr *)&server, sizeof( server ) ) < 0 ) {
+    if ( socket->Connect( server_addr ) < 0 ) {
         perror( "connect failed. Error" );
         return 1;
     }
@@ -37,13 +36,13 @@ int main(int argc , char *argv[]) {
         if ( scanf( "%s" , message ) == EOF ) break;
 
         // Send data
-        if ( send( sock, message, strlen( message ), 0 ) < 0 ) {
+        if ( socket->Send( message, strlen( message ) ) < 0 ) {
             puts("Send failed");
             return 1;
         }
          
         // Receive a reply from the server
-        if( recv( sock, server_reply, 2000, 0 ) < 0 ) {
+        if( socket->Recv( server_reply, 2000 ) < 0 ) {
             puts( "recv failed" );
             break;
         }
@@ -52,6 +51,6 @@ int main(int argc , char *argv[]) {
         puts( server_reply );
     }
      
-    close(sock);
+    // close(sock); -- TODO close socket on exit
     return 0;
 }
