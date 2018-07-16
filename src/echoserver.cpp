@@ -93,7 +93,7 @@ int main( int argc , char *argv[] ) {
         }
         #else
         pthread_t echo_thread = nullptr;
-        threads.emplace_back( echo_thread, client_sock );
+        thread_infos.emplace_back( echo_thread, client_sock );
         if ( pthread_create( &echo_thread, NULL, handle_connection, (void*) &thread_infos.back() ) < 0 ) {
             perror("could not create thread");
             break;

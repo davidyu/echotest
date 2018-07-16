@@ -8,8 +8,14 @@
 
 #include "SocketAddress.h"
 #include "UDPSocket.h"
+#include "PedanticEnums.h"
  
 int main(int argc , char *argv[]) {
+    #if defined( _WIN64 ) || defined( _WIN32 )
+    WSADATA wsa_data;
+    WSAStartup( MAKEWORD( 2, 2 ), &wsa_data );
+    #endif
+
     UDPSocket* socket = UDPSocket::Create();
     if ( socket == nullptr ) {
         perror( "Could not create socket" );
@@ -32,15 +38,16 @@ int main(int argc , char *argv[]) {
 
     // tell server to create entity with position xyz
 
-    //keep communicating with server
+    // keep communicating with server
+    char server_reply[2000];
     while ( true ) {
-        // 
-        //
-        /*
-        char * data[1000];
-        size_t size = 1000;
+        int buf[1000];
+        size_t size = 0;
 
-        if ( socket->SendTo( data, size, server_addr ) < 0 ) {
+        buf[0] = (int) PEDANTIC_MESSAGE::JOIN;
+        size++;
+
+        if ( socket->SendTo( buf, size, server_addr ) < 0 ) {
             puts("Send failed");
             return 1;
         }
@@ -53,9 +60,13 @@ int main(int argc , char *argv[]) {
          
         puts( "Server reply :" );
         puts( server_reply );
-        */
     }
      
     delete socket;
+
+    #if defined( _WIN64 ) || defined( _WIN32 )
+    WSACleanup();
+    #endif
+
     return 0;
 }

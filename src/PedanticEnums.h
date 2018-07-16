@@ -1,0 +1,9 @@
+#pragma once
+
+enum PEDANTIC_MESSAGE {
+    JOIN,
+    CLIENT_UPDATE_INPUT,
+    SERVER_UPDATE_LOCATION,
+    ACK,
+    NACK,
+};

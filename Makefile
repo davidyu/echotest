@@ -20,7 +20,7 @@ INCLUDE =-Isrc/
 .cxx.o: 
 		$(CC) $(CFLAGS) $(INCLUDE) -c -o $*.o $<
 
-all: echoserver echoclient
+all: echoserver echoclient PedanticClient
 
 echoclient: src/echoclient.o src/SocketAddress.o src/TCPSocket.o $(ALL.H)
 		$(CC) $(CFLAGS) -o $@ src/echoclient.o src/SocketAddress.o src/TCPSocket.o $(INCLUDE) $(LIBDIR) $(LIBS)
@@ -28,7 +28,10 @@ echoclient: src/echoclient.o src/SocketAddress.o src/TCPSocket.o $(ALL.H)
 echoserver: src/echoserver.o src/SocketAddress.o src/TCPSocket.o $(ALL.H)
 		$(CC) $(CFLAGS) -o $@ src/echoserver.o src/SocketAddress.o src/TCPSocket.o $(INCLUDE) $(LIBDIR) $(LIBS)
 
-ALL.O = src/echoserver.o src/echoclient.o src/SocketAddress.o src/TCPSocket.o
+PedanticClient: src/PedanticClient.o src/SocketAddress.o src/UDPSocket.o $(ALL.H)
+		$(CC) $(CFLAGS) -o $@ src/PedanticClient.o src/SocketAddress.o src/UDPSocket.o $(INCLUDE) $(LIBDIR) $(LIBS)
+
+ALL.O = src/echoserver.o src/echoclient.o src/SocketAddress.o src/TCPSocket.o src/pedanticclient.o src/UDPSocket.o
 
 ALL.H = $(wildcard src/*.h)
 
