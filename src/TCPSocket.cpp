@@ -3,6 +3,7 @@
 #include <sys/socket.h>
 #include <arpa/inet.h>
 #include <errno.h>
+#include <unistd.h>
 
 TCPSocket* TCPSocket::Create() {
     #if defined( _WIN64 ) || defined( _WIN32 )
@@ -103,4 +104,9 @@ int TCPSocket::Recv( void* buf, int len ) {
         #endif
     }
     return bytesReceived;
+}
+
+int TCPSocket::Close() {
+    close( sock_ );
+    closed_ = true;
 }

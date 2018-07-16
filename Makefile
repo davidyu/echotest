@@ -22,10 +22,10 @@ INCLUDE =-Isrc/
 
 all: server client
 
-client: src/client.o src/SocketAddress.o src/TCPSocket.o
+client: src/client.o src/SocketAddress.o src/TCPSocket.o $(ALL.H)
 		$(CC) $(CFLAGS) -o $@ src/client.o src/SocketAddress.o src/TCPSocket.o $(INCLUDE) $(LIBDIR) $(LIBS)
 
-server: src/server.o src/SocketAddress.o src/TCPSocket.o
+server: src/server.o src/SocketAddress.o src/TCPSocket.o $(ALL.H)
 		$(CC) $(CFLAGS) -o $@ src/server.o src/SocketAddress.o src/TCPSocket.o $(INCLUDE) $(LIBDIR) $(LIBS)
 
 ALL.O = src/server.o src/client.o src/SocketAddress.o src/TCPSocket.o
