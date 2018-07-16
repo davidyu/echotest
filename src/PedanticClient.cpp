@@ -2,13 +2,10 @@
 
 #include <stdio.h> //printf
 #include <string.h>    //strlen
-#include <sys/socket.h>    //socket
-#include <arpa/inet.h> //inet_addr
-#include <unistd.h>
 
 #include "SocketAddress.h"
 #include "UDPSocket.h"
-#include "PedanticEnums.h"
+#include "PedanticCommon.h"
  
 int main(int argc , char *argv[]) {
     #if defined( _WIN64 ) || defined( _WIN32 )
@@ -41,10 +38,10 @@ int main(int argc , char *argv[]) {
     // keep communicating with server
     char server_reply[2000];
     while ( true ) {
-        int buf[1000];
+        char buf[1000];
         size_t size = 0;
 
-        buf[0] = (int) PEDANTIC_MESSAGE::JOIN;
+        buf[0] = (char) PEDANTIC_MESSAGE::JOIN;
         size++;
 
         if ( socket->SendTo( buf, size, server_addr ) < 0 ) {
@@ -53,13 +50,13 @@ int main(int argc , char *argv[]) {
         }
          
         // Receive a reply from the server
-        if ( socket->RecvFrom( server_reply, 2000, server_addr ) < 0 ) {
+        if ( socket->RecvFrom( server_reply, 2000, server_addr ) > 0 ) {
+            puts( "Server reply :" );
+            puts( server_reply );
+        } else {
             puts( "recv failed" );
             break;
         }
-         
-        puts( "Server reply :" );
-        puts( server_reply );
     }
      
     delete socket;

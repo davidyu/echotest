@@ -3,4 +3,5 @@
 pushd build
 cl -EHsc -Zi -I..\src ..\src\echoclient.cpp ..\src\SocketAddress.cpp ..\src\TCPSocket.cpp Kernel32.lib Ws2_32.lib
 cl -EHsc -Zi -I..\src ..\src\echoserver.cpp ..\src\SocketAddress.cpp ..\src\TCPSocket.cpp Kernel32.lib Ws2_32.Lib
+cl -EHsc -Zi -I..\src ..\src\PedanticClient.cpp ..\src\SocketAddress.cpp ..\src\UDPSocket.cpp Kernel32.lib Ws2_32.Lib
 popd

@@ -36,7 +36,7 @@ int TCPSocket::Bind( const SocketAddress& local_addr ) {
     int ret = bind( sock_, local_addr.Get(), local_addr.GetSize() );
     if ( ret < 0 ) {
         #if defined( _WIN64 ) || defined( _WIN32 )
-        return WSAGetLastError();
+        return -WSAGetLastError();
         #else
         return errno;
         #endif
@@ -48,7 +48,7 @@ int TCPSocket::Connect( const SocketAddress& server_addr ) {
     int ret = connect( sock_, server_addr.Get(), sizeof( struct sockaddr ) );
     if ( ret < 0 ) {
         #if defined( _WIN64 ) || defined( _WIN32 )
-        return WSAGetLastError();
+        return -WSAGetLastError();
         #else
         return errno;
         #endif
@@ -61,7 +61,7 @@ int TCPSocket::Listen( int max_backlog ) {
     int ret = listen( sock_, max_backlog );
     if ( ret < 0 ) {
         #if defined( _WIN64 ) || defined( _WIN32 )
-        return WSAGetLastError();
+        return -WSAGetLastError();
         #else
         return errno;
         #endif
@@ -94,7 +94,7 @@ int TCPSocket::Send( const void* data, int len ) {
     int bytesSent = send( sock_, static_cast<const char*>( data ), len, 0 );
     if ( bytesSent <= 0 ) {
         #if defined( _WIN64 ) || defined( _WIN32 )
-        return WSAGetLastError();
+        return -WSAGetLastError();
         #else
         return errno;
         #endif
@@ -106,7 +106,7 @@ int TCPSocket::Recv( void* buf, int len ) {
     int bytesReceived = recv( sock_, static_cast<char*>( buf ), len, 0 );
     if ( bytesReceived <= 0 ) {
         #if defined( _WIN64 ) || defined( _WIN32 )
-        return WSAGetLastError();
+        return -WSAGetLastError();
         #else
         return errno;
         #endif
