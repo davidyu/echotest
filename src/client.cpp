@@ -51,6 +51,6 @@ int main(int argc , char *argv[]) {
         puts( server_reply );
     }
      
-    // close(sock); -- TODO close socket on exit
+    delete socket;
     return 0;
 }

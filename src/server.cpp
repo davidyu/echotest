@@ -58,6 +58,7 @@ int main( int argc , char *argv[] ) {
         puts("Handler assigned");
     }
      
+    delete server_socket;
     return 0;
 }
 
@@ -86,8 +87,7 @@ void * handle_connection( void *client_sock )
         perror( "recv failed" );
     }
          
-    // Free the socket pointer
-    // free( socket_desc );
+    delete sock;
 
     pthread_exit( client_sock );
 }
