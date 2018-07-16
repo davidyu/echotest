@@ -129,13 +129,14 @@ void * handle_connection( void * context )
     }
 
     int read_size;
-    char *message, client_message[2000];
+    char client_message[2000];
      
     //Receive a message from client
     while ( ( read_size = sock->Recv( client_message, 2000 ) ) > 0 )
     {
-        //Send the message back to client
-        sock->Send( client_message, strlen( client_message ) );
+        // send the message back to client; assume a null-terminated string
+        // send bytes equal to the message plus the null-terminator
+        sock->Send( client_message, strlen( client_message ) + 1 );
     }
      
     if ( read_size == 0 ) {

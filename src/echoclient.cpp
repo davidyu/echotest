@@ -8,7 +8,7 @@
 #include "TCPSocket.h"
  
 int main(int argc , char *argv[]) {
-    char message[1000] , server_reply[2000];
+    char message[1000], server_reply[2000];
      
     #if defined( _WIN64 ) || defined( _WIN32 )
     WSADATA wsa_data;
@@ -38,9 +38,10 @@ int main(int argc , char *argv[]) {
         printf( "Enter message : " );
         if ( scanf( "%s" , message ) == EOF ) break;
 
-        // Send data
-        if ( socket->Send( message, strlen( message ) ) < 0 ) {
-            puts("Send failed");
+        // send the message to the server; assume a null-terminated string
+        // send bytes equal to the message plus the null-terminator
+        if ( socket->Send( message, strlen( message ) + 1 ) < 0 ) {
+            puts( "Send failed" );
             return 1;
         }
          
