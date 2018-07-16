@@ -5,7 +5,7 @@
 class UDPSocket {
 public:
     static UDPSocket* Create();
-    virtual          ~UDPSocket() {} // TODO free and close me
+    virtual          ~UDPSocket() {}
 
     int               Bind     ( const SocketAddress& local_addr );
     int               SendTo   ( const void* data, int len, const SocketAddress& to_addr );

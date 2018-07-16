@@ -5,7 +5,7 @@
 class TCPSocket {
 public:
     static TCPSocket* Create();
-    virtual          ~TCPSocket() {} // TODO free me
+    virtual          ~TCPSocket();
 
     int               Bind   ( const SocketAddress& local_addr );
     int               Connect( const SocketAddress& server_addr );

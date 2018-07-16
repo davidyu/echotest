@@ -23,6 +23,9 @@ TCPSocket* TCPSocket::Create() {
     #endif
 }
 
+TCPSocket::~TCPSocket() {
+    Close();
+}
 
 int TCPSocket::Bind( const SocketAddress& local_addr ) {
     int ret = bind( sock_, local_addr.Get(), local_addr.GetSize() );
@@ -107,6 +110,10 @@ int TCPSocket::Recv( void* buf, int len ) {
 }
 
 int TCPSocket::Close() {
-    close( sock_ );
-    closed_ = true;
+    int ret = close( sock_ );
+    if ( ret == 0 ) {
+        closed_ = true;
+    }
+
+    return closed_;
 }
