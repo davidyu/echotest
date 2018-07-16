@@ -1,10 +1,8 @@
 #include "app_constants.h"
 
-#include <stdio.h> //printf
-#include <string.h>    //strlen
-#include <sys/socket.h>    //socket
-#include <arpa/inet.h> //inet_addr
-#include <unistd.h>
+#include <stdio.h>
+#include <string.h>
+// #include <unistd.h> -- do we need this?
 
 #include "SocketAddress.h"
 #include "TCPSocket.h"
@@ -12,6 +10,11 @@
 int main(int argc , char *argv[]) {
     char message[1000] , server_reply[2000];
      
+    #if defined( _WIN64 ) || defined( _WIN32 )
+    WSADATA wsa_data;
+    WSAStartup( MAKEWORD( 2, 2 ), &wsa_data );
+    #endif
+
     TCPSocket* socket = TCPSocket::Create();
     if ( socket == nullptr ) {
         perror( "Could not create socket" );
@@ -52,5 +55,10 @@ int main(int argc , char *argv[]) {
     }
      
     delete socket;
+
+    #if defined( _WIN64 ) || defined( _WIN32 )
+    WSACleanup();
+    #endif
+
     return 0;
 }

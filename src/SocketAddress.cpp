@@ -1,6 +1,9 @@
 #include "SocketAddress.h"
 
 #include <string.h>
+#if defined( _WIN64 ) || defined( _WIN32 )
+#include <ws2tcpip.h>
+#endif
 
 SocketAddress::SocketAddress( uint16_t port ) {
     sockaddr_in* addr = GetSockAddrIn();

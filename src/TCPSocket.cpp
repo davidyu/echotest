@@ -1,9 +1,14 @@
 #include "TCPSocket.h"
 
+#if defined( _WIN64 ) || defined( _WIN32 )
+#include <WinSock2.h>
+#include <windows.h>
+#else
 #include <sys/socket.h>
 #include <arpa/inet.h>
-#include <errno.h>
 #include <unistd.h>
+#endif
+#include <errno.h>
 
 TCPSocket* TCPSocket::Create() {
     #if defined( _WIN64 ) || defined( _WIN32 )
@@ -67,7 +72,7 @@ int TCPSocket::Listen( int max_backlog ) {
 
 TCPSocket * TCPSocket::Accept( SocketAddress& client_addr ) {
     #if defined( _WIN64 ) || defined( _WIN32 )
-    size_t len = client_addr.GetSize();
+    int len = client_addr.GetSize();
     SOCKET clientSock = accept( sock_, client_addr.GetWritableAddr(), &len );
     if ( clientSock != INVALID_SOCKET ) {
         return new TCPSocket( clientSock );
@@ -110,7 +115,11 @@ int TCPSocket::Recv( void* buf, int len ) {
 }
 
 int TCPSocket::Close() {
+    #if defined( _WIN64 ) || defined( _WIN32 )
+    int ret = closesocket( sock_ );
+    #else
     int ret = close( sock_ );
+    #endif
     if ( ret == 0 ) {
         closed_ = true;
     }

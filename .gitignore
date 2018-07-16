@@ -31,5 +31,9 @@
 *.out
 *.app
 
+# OS X/Linux binaries
 *server
 *client
+
+# Windows VS build output
+build/

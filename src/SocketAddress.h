@@ -1,8 +1,13 @@
 #pragma once
 
 #include <stdint.h>
+#if defined( _WIN64 ) || defined( _WIN32 )
+#include <WinSock2.h>
+#include <windows.h>
+#else
 #include <sys/socket.h>
 #include <arpa/inet.h>
+#endif
 
 class SocketAddress {
 public:
