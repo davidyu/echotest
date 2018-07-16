@@ -20,15 +20,15 @@ INCLUDE =-Isrc/
 .cxx.o: 
 		$(CC) $(CFLAGS) $(INCLUDE) -c -o $*.o $<
 
-all: server client
+all: echoserver echoclient
 
-client: src/client.o src/SocketAddress.o src/TCPSocket.o $(ALL.H)
-		$(CC) $(CFLAGS) -o $@ src/client.o src/SocketAddress.o src/TCPSocket.o $(INCLUDE) $(LIBDIR) $(LIBS)
+echoclient: src/echoclient.o src/SocketAddress.o src/TCPSocket.o $(ALL.H)
+		$(CC) $(CFLAGS) -o $@ src/echoclient.o src/SocketAddress.o src/TCPSocket.o $(INCLUDE) $(LIBDIR) $(LIBS)
 
-server: src/server.o src/SocketAddress.o src/TCPSocket.o $(ALL.H)
-		$(CC) $(CFLAGS) -o $@ src/server.o src/SocketAddress.o src/TCPSocket.o $(INCLUDE) $(LIBDIR) $(LIBS)
+echoserver: src/echoserver.o src/SocketAddress.o src/TCPSocket.o $(ALL.H)
+		$(CC) $(CFLAGS) -o $@ src/echoserver.o src/SocketAddress.o src/TCPSocket.o $(INCLUDE) $(LIBDIR) $(LIBS)
 
-ALL.O = src/server.o src/client.o src/SocketAddress.o src/TCPSocket.o
+ALL.O = src/echoserver.o src/echoclient.o src/SocketAddress.o src/TCPSocket.o
 
 ALL.H = $(wildcard src/*.h)
 
