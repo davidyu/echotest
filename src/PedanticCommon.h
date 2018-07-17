@@ -2,6 +2,7 @@
 
 const int PEDANTIC_CLIENT_PORT = 10001;
 const int PEDANTIC_SERVER_PORT = 10002;
+const int BUFFER_MTU = 1300; // we should not let our buffers exceed this size before sending
 
 enum PEDANTIC_MESSAGE {
     JOIN = 1,
